@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "express": "^4.16.3"
+  },
+  "name": "slack-logger",
+  "version": "1.0.0",
+  "description": "When 10k messages just isn't enough.",
+  "main": "app.js",
+  "author": "Richard Gan <richard@designedbymajor.ca>",
+  "repository": "github:Visate/slack-logger",
+  "license": "MIT"
+}
