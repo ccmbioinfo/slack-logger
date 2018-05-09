@@ -22,7 +22,7 @@ app.use(bodyParser.json());
 app.post('/log', (req, res) => {
   console.log(`Received logging call of type ${req.body.type} || Token Status: ${req.body.token === slackToken}`);
 
-  if (!verifiyToken(res.body.token)) return;
+  if (!verifiyToken(req.body.token)) return;
 
   if (req.body.type === 'url_verification') {
     console.log("Responding to Slack's Events URL verification request.");
