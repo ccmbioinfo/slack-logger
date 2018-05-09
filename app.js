@@ -28,6 +28,14 @@ app.post('/log', (req, res) => {
     console.log("Responding to Slack's Events URL verification request.");
     res.json({ challenge: req.body.challenge });
   }
+
+  else if (req.body.type === 'event_callback') {
+    let event = req.body.event;
+    console.log(`Received ${event.type} event.`);
+    if (event.type === 'message') {
+      console.log(`${event.user} in the ${event.channel} ${event.channel_type} said ${event.text}`);
+    }
+  }
 });
 
 app.listen(port, () => console.log(`App listening on port ${port}!`))
