@@ -3,8 +3,8 @@ const bodyParser = require('body-parser');
 const config = require('./config');
 
 const app = express()
-const port = process.env.PORT || config.port || 3000;
-const slackToken = process.env.SLACK_VERIFICATION_TOKEN || config.token;
+const port = config.port;
+const slackToken = config.token;
 
 app.use(bodyParser.json());
 
