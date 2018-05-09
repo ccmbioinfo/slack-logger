@@ -15,7 +15,6 @@ app.post('/log', (req, res) => {
     
     if (req.body.token !== slackToken) {
       console.error('Token received from Slack and token given do not match!');
-      throw Error('Mismatched tokens, please check the token.');
     }
 
     else {
