@@ -38,10 +38,10 @@ app.post('/log', (req, res) => {
   }
 });
 
-app.post('/activate', bodyParser.urlencoded(), (req, res) => {
+app.post('/activate', bodyParser.urlencoded({ extended: true }), (req, res) => {
   console.log(`Received enablelogger command call || Token Status: ${req.body.token === slackToken}`);
 
-  if (!verifiyToken(res.body.token)) return;
+  if (!verifiyToken(req.body.token)) return;
 
   request.get({
     url: 'https://slack.com/api/apps.permissions.request', 
