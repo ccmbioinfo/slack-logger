@@ -38,4 +38,35 @@ app.post('/log', (req, res) => {
   }
 });
 
+app.post('/activate', bodyParser.urlencoded(), (req, res) => {
+  console.log(`Received enablelogger command call || Token Status: ${req.body.token === slackToken}`);
+
+  if (!verifiyToken(res.body.token)) return;
+
+  request.get({
+    url: 'https://slack.com/api/apps.permissions.request', 
+    
+    form: {
+      token: workspaceToken,
+      scopes: 'channels:history,channels:read,' +
+              'groups:history,groups:read,' +
+              'im:history,im:read,' +
+              'mpim:history,mpim:read',
+      trigger_id: req.body.trigger_id
+    }}, 
+
+    (error, response, body) => {
+      let message;
+      body = JSON.parse(body)
+      if (body.ok && !error && response.statusCode === 200) message = "Success!";
+      else message = 'Something went wrong. Please try again later!';
+
+      request.post({url: req.body.response_url, json: true, body: {
+        response_type: 'ephemeral',
+        text: message
+      }});
+  });
+
+});
+
 app.listen(port, () => console.log(`App listening on port ${port}!`))
