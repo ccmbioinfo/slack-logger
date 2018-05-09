@@ -7,16 +7,22 @@ const app = express()
 const port = config.port;
 const slackSecret = config.slack.secret;
 const slackToken = config.slack.verificationToken;
+const workspaceToken = config.slack.workspaceToken;
+
+function verifiyToken(token) {
+  if (token !== slackToken) {
+    console.error('Token received does not match the token provided by Slack.')
+    return false;
+  }
+  return true;
+}
 
 app.use(bodyParser.json());
 
 app.post('/log', (req, res) => {
-  console.log(`Received call of type ${req.body.type} || Token Status: ${req.body.token == slackToken}`);
+  console.log(`Received logging call of type ${req.body.type} || Token Status: ${req.body.token === slackToken}`);
 
-  if (req.body.token !== slackToken) {
-    console.error('Token received does not match the token provided by Slack. Ignoring call...');
-    return;
-  }
+  if (!verifiyToken(res.body.token)) return;
 
   if (req.body.type === 'url_verification') {
     console.log("Responding to Slack's Events URL verification request.");
