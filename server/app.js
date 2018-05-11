@@ -11,7 +11,7 @@ const workspaceToken = config.slack.workspaceToken;
 
 function verifiyToken(token) {
   if (token !== slackToken) {
-    console.error('Token received does not match the token provided by Slack.')
+    console.error('Token received does not match the token provided by Slack.');
     return false;
   }
   return true;
@@ -20,7 +20,7 @@ function verifiyToken(token) {
 app.use(bodyParser.json());
 
 app.post('/log', (req, res) => {
-  console.log(`Received logging call of type ${req.body.type} || Token Status: ${req.body.token === slackToken}`);
+  console.log(`Received event logging call of type ${req.body.type} || Token Status: ${req.body.token === slackToken}`);
 
   if (!verifiyToken(req.body.token)) return;
 
@@ -39,4 +39,4 @@ app.post('/log', (req, res) => {
   }
 });
 
-app.listen(port, () => console.log(`App listening on port ${port}!`))
+app.listen(port, () => console.log(`App listening on port ${port}!`));

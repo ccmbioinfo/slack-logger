@@ -1,0 +1,1 @@
+conn = new Mongo();

@@ -1,0 +1,36 @@
+version: "3.5"
+services:
+  server:
+    image: slack-logger:latest
+    restart_policy:
+      condition: on-failure
+    networks:
+      - database
+    ports:
+      - "80:80"
+    environment:
+      SLACK_CLIENT_ID: /run/secrests/SLACK_CLIENT_ID
+      SLACK_SECRET: /run/secrets/SLACK_SECRET
+      SLACK_VERIFICATION_TOKEN: /run/secrets/SLACK_VERIFICATION_TOKEN
+      WORKSPACE_TOKEN: /run/secrets/WORKSPACE_TOKEN
+    secrets:
+      - SLACK_CLIENT_ID
+      - SLACK_SECRET
+      - SLACK_VERIFICATION_TOKEN
+      - WORKSPACE_TOKEN
+    db:
+      image: mongo-with-setup:latest
+      restart_policy:
+        condition: always
+      volumes:
+        - db_data:/var/lib/mongodb
+      environment:
+secrets:
+  SLACK_CLIENT_ID:
+    external: true
+  SLACK_SECRET:
+    external: true
+  SLACK_VERIFICATION_TOKEN:
+    external: true
+  WORKSPACE_TOKEN:
+    external: true
