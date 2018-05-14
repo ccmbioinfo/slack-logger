@@ -30,7 +30,7 @@ app.post('/log', (req, res) => {
   }
 
   else if (req.body.type === 'event_callback') {
-    res.statusCode(200);
+    res.sendStatus(200);
     let event = req.body.event;
     console.log(`Received ${event.type} event.`);
     if (event.type === 'message') {
