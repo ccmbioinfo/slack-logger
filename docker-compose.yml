@@ -2,8 +2,8 @@ version: "3.5"
 services:
   server:
     image: slack-logger:latest
-    restart_policy:
-      condition: on-failure
+    depends_on:
+      - db
     networks:
       - database
     ports:
@@ -17,21 +17,22 @@ services:
       - SLACK_CLIENT_ID
       - SLACK_SECRET
       - SLACK_VERIFICATION_TOKEN
-      - WORKSPACE_TOKEN
+      - SLACK_WORKSPACE_TOKEN
+      - MONGO_APP_PASSWORD
   db:
     image: mongo-with-setup:latest
-    restart_policy:
-      condition: always
     volumes:
       - db_data:/var/lib/mongodb
     networks:
       - database
+    ports:
+      - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: mongoadmin
       MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/MONGO_ROOT_PASSWORD
       MONGO_INITDB_DATABASE: slacklog
     secrets:
-      - MONGO_ROOT_PASSWORD_FILE
+      - MONGO_ROOT_PASSWORD
       - MONGO_APP_PASSWORD
 secrets:
   SLACK_CLIENT_ID:
@@ -46,5 +47,7 @@ secrets:
     file: secrets/MONGO_ROOT_PASSWORD
   MONGO_APP_PASSWORD:
     file: secrets/MONGO_APP_PASSWORD
+networks:
+  database:
 volumes:
   db_data:
