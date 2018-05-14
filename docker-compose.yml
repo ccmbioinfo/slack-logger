@@ -18,19 +18,33 @@ services:
       - SLACK_SECRET
       - SLACK_VERIFICATION_TOKEN
       - WORKSPACE_TOKEN
-    db:
-      image: mongo-with-setup:latest
-      restart_policy:
-        condition: always
-      volumes:
-        - db_data:/var/lib/mongodb
-      environment:
+  db:
+    image: mongo-with-setup:latest
+    restart_policy:
+      condition: always
+    volumes:
+      - db_data:/var/lib/mongodb
+    networks:
+      - database
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/MONGO_ROOT_PASSWORD
+      MONGO_INITDB_DATABASE: slacklog
+    secrets:
+      - MONGO_ROOT_PASSWORD_FILE
+      - MONGO_APP_PASSWORD
 secrets:
   SLACK_CLIENT_ID:
-    external: true
+    file: secrets/SLACK_CLIENT_ID
   SLACK_SECRET:
-    external: true
+    file: secrets/SLACK_SECRET
   SLACK_VERIFICATION_TOKEN:
-    external: true
-  WORKSPACE_TOKEN:
-    external: true
+    file: secrets/SLACK_VERIFICATION_TOKEN
+  SLACK_WORKSPACE_TOKEN:
+    file: secrets/SLACK_WORKSPACE_TOKEN
+  MONGO_ROOT_PASSWORD:
+    file: secrets/MONGO_ROOT_PASSWORD
+  MONGO_APP_PASSWORD:
+    file: secrets/MONGO_APP_PASSWORD
+volumes:
+  db_data:
