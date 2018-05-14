@@ -8,6 +8,7 @@ module.exports = {
       'utf8').trim();
     }
     catch(e) {
+      console.log(`failed to fetch secret ${secret}, err: ${e}`);
       return false;
     }
   }

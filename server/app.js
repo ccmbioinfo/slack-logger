@@ -17,13 +17,22 @@ const mongoPassword = config.mongo.password;
 const address = `mongodb://slacklogger:${mongoPassword}@${mongoAddress}/${mongoDatabase}`;
 let db;
 
-MongoClient.connect(address, (err, database) => {
-  if (err) throw err;
+function establishConnection() {
+  MongoClient.connect(address, (err, database) => {
+    if (err) {
+      // try to reconnect in 5s
+      console.log('Reconnecting to db in 5 seconds...');
+      setTimeout(establishConnection, 5000);
+    }
 
-  db = database;
-
-  app.listen(port, () => console.log(`App listening on port ${port}!`));
-});
+    else {
+      // established db connection, start app
+      db = database.db('slacklog');
+      console.log('Established connection to db.');
+      app.listen(port, () => console.log(`App listening on port ${port}!`));
+    }
+  });
+}
 
 
 function verifySlackToken(token) {
@@ -47,7 +56,7 @@ app.post('/log', (req, res) => {
   }
 
   else if (req.body.type === 'event_callback') {
-    res.statusCode(200);
+    res.sendStatus(200);
     let event = req.body.event;
     console.log(`Received ${event.type} event.`);
 
@@ -74,7 +83,7 @@ app.post('/log', (req, res) => {
           }
         });
       }
-
+      
       // Inserts event as is into messages collection, adding arr for edited
       else {
         event.edited = [];
@@ -86,4 +95,5 @@ app.post('/log', (req, res) => {
   }
 });
 
-app.listen(port, () => console.log(`App listening on port ${port}!`));
+// allow db some time to initialize
+setTimeout(establishConnection, 2000);
