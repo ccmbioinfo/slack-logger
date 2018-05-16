@@ -12,9 +12,4 @@ db.createUser({
   roles: ['readWrite']  
 });
 
-db.createCollection('messages', {
-  indexOptionDefaults: {
-    'channel': 1,
-    'ts': -1
-  }
-});
+db.messages.createIndex({ channel: 1, ts: -1 });

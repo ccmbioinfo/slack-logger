@@ -22,11 +22,9 @@ services:
   db:
     image: mongo-with-setup:latest
     volumes:
-      - db_data:/var/lib/mongodb
+      - /var/lib/mongodb:/data/db
     networks:
       - database
-    ports:
-      - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: mongoadmin
       MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/MONGO_ROOT_PASSWORD
@@ -49,5 +47,3 @@ secrets:
     file: secrets/MONGO_APP_PASSWORD
 networks:
   database:
-volumes:
-  db_data:
