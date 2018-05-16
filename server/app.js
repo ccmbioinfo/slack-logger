@@ -62,35 +62,81 @@ app.post('/log', (req, res) => {
 
     if (event.type === 'message') {
       let messages = db.collection('messages');
-      console.log(`${event.user} in the ${event.channel_type} ${event.channel} said ${event.text}`);
       
-      // Appends to edited array in message
-      // push the edited object with text and ts at position 0
-      if (event.edited) {
-        message.findOneAndUpdate({ // search params
+      // Comment in a thread
+      if (event.thread_ts) {
+        // Update thread head
+        // Doesn't push text since should
+        // reference comment message itself
+        messages.findOneAndUpdate({
           channel: event.channel,
-          ts: event.ts
+          ts: event.thread_ts
         },
         {
           $push: {
-            edited: {
+            thread: {
               $each: [{
-                text: event.text,
-                ts: event.edited.ts
+                user: event.user,
+                ts: event.ts
               }],
               $position: 0
             }
           }
         });
-      }
-      
-      // Inserts event as is into messages collection, adding arr for edited
-      else {
+
+        // Push event as is with edited array
         event.edited = [];
         messages.insertOne(event);
       }
-    }
 
+      else if (event.subtype === 'message_changed') {
+        // Thread broadcasts are ignored because they do not really
+        // follow the standard convention and are fairly unnecessary
+        // as comments are caught as normal messages anyways.
+        if (event.message.subtype !== 'thread_broadcast') {
+
+          // Appends to edited array in message
+          // push the edited object with text and ts at position 0
+          messages.findOneAndUpdate({
+            channel: event.message.channel,
+            ts: event.message.ts
+          },
+          {
+            $push: {
+              edited: {
+                $each: [{
+                  user: event.message.edited.user,
+                  text: event.message.text,
+                  ts: event.message.edited.ts
+                }],
+                $position: 0
+              }
+            }
+          });
+          
+        }
+      }
+
+      // Sets deleted and time deleted in message object
+      else if (event.subtype === 'message_deleted') {
+        messages.findOneAndUpdate({
+          channel: event.channel,
+          ts: event.deleted_ts
+        },
+        {
+          $set: {
+            deleted: true,
+            deleted_ts: event.ts
+          }
+        });
+      }
+      
+      // Inserts event as is into messages collection
+      else {
+        event.edited = [];
+        event.thread = [];
+        messages.insertOne(event);
+      }
     }
   }
 });
